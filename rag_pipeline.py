@@ -22,7 +22,7 @@ def create_qa_chain(pdf_path):
 
     # 3. Create embeddings
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
+        model_name="sentence-transformers/all-mpnet-base-v2"
     )
 
     # 4. Store embeddings in FAISS
