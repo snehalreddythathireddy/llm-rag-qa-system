@@ -16,6 +16,6 @@ if uploaded_file:
  question = st.text_input("Ask a question from the document")
 
  if question:
-     answer = qa.run(question)
-     st.subheader("Answer:")
-     st.write(answer)
+     response = qa({"query": question})
+  st.write(response["result"])
+
