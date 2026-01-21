@@ -7,17 +7,15 @@ st.title("📚 LLM-powered RAG QA System")
 uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
 
 if uploaded_file:
- with tempfile.NamedTemporaryFile(delete=False) as tmp:
-     tmp.write(uploaded_file.read())
-     pdf_path = tmp.name
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        tmp.write(uploaded_file.read())
+        pdf_path = tmp.name
 
- qa = create_qa_chain(pdf_path)
+    qa_chain = create_qa_chain(pdf_path)
 
- question = st.text_input("Ask a question from the document")
+question = st.text_input("Ask a question from the document")
 
- if question:
+if question and uploaded_file:
     response = qa_chain({"query": question})
     st.subheader("Answer")
     st.write(response["result"])
-
-
