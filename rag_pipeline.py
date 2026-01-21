@@ -4,39 +4,40 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.llms import HuggingFacePipeline
 from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
 from transformers import pipeline
+from langchain.prompts import PromptTemplate
 
 
 def create_qa_chain(pdf_path):
-    # 1. Load PDF
+    # Load PDF
     loader = PyPDFLoader(pdf_path)
     documents = loader.load()
 
-    # 2. Split text into chunks (⬅️ CHANGE CHUNK SIZE HERE)
+    # Split text into chunks
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=300,       # 👈 THIS is chunk size
-        chunk_overlap=100
+        chunk_size=1000,      # 👈 better accuracy
+        chunk_overlap=150
     )
     texts = splitter.split_documents(documents)
 
-    # 3. Create embeddings
+    # Create embeddings
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-mpnet-base-v2"
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    # 4. Store embeddings in FAISS
+    # Store embeddings in FAISS
     vectorstore = FAISS.from_documents(texts, embeddings)
 
-    # 5. Load LLM
+    # Load LLM
     llm_pipeline = pipeline(
         "text2text-generation",
         model="google/flan-t5-base",
         max_length=256
     )
+
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
-    # 6. Strict prompt to avoid hallucination
+    # Prompt
     prompt = PromptTemplate(
         template="""
 You are an AI assistant answering questions strictly based on the provided context.
@@ -53,10 +54,10 @@ Answer:
         input_variables=["context", "question"]
     )
 
-    # 7. Create RAG chain
+    # Create QA chain
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
-        retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
+        retriever=vectorstore.as_retriever(search_kwargs={"k": 4}),
         chain_type_kwargs={"prompt": prompt}
     )
 
