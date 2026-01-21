@@ -2,11 +2,12 @@ import streamlit as st
 import tempfile
 from rag_pipeline import create_qa_chain
 
+st.set_page_config(page_title="LLM-powered RAG QA System", layout="wide")
 st.title("📚 LLM-powered RAG QA System")
 
 uploaded_file = st.file_uploader("Upload a PDF", type="pdf")
 
-qa_chain = None   # ✅ IMPORTANT: define it first
+qa_chain = None
 
 if uploaded_file:
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -22,4 +23,3 @@ if question and qa_chain is not None:
     response = qa_chain({"query": question})
     st.subheader("Answer")
     st.write(response["result"])
-
