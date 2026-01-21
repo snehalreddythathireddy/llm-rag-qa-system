@@ -27,9 +27,30 @@ def create_qa_chain(pdf_path):
 
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=vectorstore.as_retriever()
+    from langchain.prompts import PromptTemplate
+
+prompt = PromptTemplate(
+    template="""
+You are an AI assistant answering questions strictly based on the provided context.
+If the answer is not in the context, say "I don't know based on the document."
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+""",
+    input_variables=["context", "question"]
+)
+
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 3}),
+    chain_type_kwargs={"prompt": prompt}
+)
+
     )
 
     return qa_chain
