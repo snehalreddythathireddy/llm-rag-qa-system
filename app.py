@@ -2,6 +2,7 @@ import streamlit as st
 import tempfile
 from rag_pipeline import create_qa_chain
 
+
 st.set_page_config(page_title="LLM-powered RAG QA System", layout="wide")
 st.title("📚 LLM-powered RAG QA System")
 
